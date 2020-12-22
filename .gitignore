@@ -1,0 +1,11 @@
+.Rhistory
+.RData
+.Rproj.user
+data
+*.xlsx
+*.xls
+*.csv
+*.rda
+dosare_juridic_25_nov_2020
+dosare_juridic_6_dec_2020
+lista_dosare_noi
