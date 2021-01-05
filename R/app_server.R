@@ -8,9 +8,10 @@ app_server <- function( input, output, session ) {
   # List the first level callModules here
   sidebar_selected <- c()
   load("data/litigii_update.rda")
+  load("data/litigii_curente.rda")
   
-  
-  vals <- reactiveValues(sidebar_selected = sidebar_selected, litigii_update = litigii_update)
+  vals <- reactiveValues(sidebar_selected = sidebar_selected, litigii_update = litigii_update,
+                         litigii_curente = litigii_curente)
   
   callModule(mod_sidebar_server, "sidebar_ui_1",vals)
   

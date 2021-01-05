@@ -11,7 +11,7 @@ mod_litigii_platite_ui <- function(id){
   ns <- NS(id)
  
   shinydashboard::box(title = "Update plati",
-    width = 12,  status = "success", collapsible = T,  collapsed = F,
+    width = 12,  status = "success", collapsible = T,  collapsed = T,
     DT::dataTableOutput(ns("sinteza_bi_plati")),
     hr(),
     fluidRow(
@@ -46,13 +46,26 @@ mod_litigii_platite_server <- function(input, output, session,vals){
   vals_litigii_platite <- reactiveValues(bi_litigii_contracte_platite = bi_litigii_contracte_platite,
                                          sinteza_bi_litigii = sinteza_bi_litigii)
   
+  observe({
+    
+    vals_litigii_platite$litigii_platite <- vals$litigii_curente %>% 
+      # I filter out contracte already processed
+      dplyr::filter(updated_by != "automated_contract_platit" | is.na(updated_by)) %>% 
+      # I filter only contracts within contracte platite
+      dplyr::filter(`Nr contract` %in% vals_litigii_platite$bi_litigii_contracte_platite$`Numar contract`) %>%
+      # I do not use left_join since I work with reactive dataframes and left_joins creates multiple columns - it is activated multiple times
+      dplyr::mutate(data_plata = vals_litigii_platite$bi_litigii_contracte_platite$DataPlata1[match(`Nr contract`,
+                                    table = vals_litigii_platite$bi_litigii_contracte_platite$`Numar contract`)],
+                    ValoarePlata1 = vals_litigii_platite$bi_litigii_contracte_platite$ValoarePlata1[match(`Nr contract`,
+                              table = vals_litigii_platite$bi_litigii_contracte_platite$`Numar contract`)]) %>%
+      dplyr::filter(data_plata > as.Date("2020-09-30"))
+  })
   # Here I calculate contracte platite
   output$litigii_contracte_platite <- DT::renderDataTable ({req(vals_litigii_platite$litigii_platite)
     DT::datatable(class = "nowrap",rownames = FALSE, 
                   selection = list(mode = "single",selected = NULL, target = "row"),
-                  data = vals_litigii_platite$litigii_platite %>% 
-                    dplyr::relocate(`Stadiul procesului`,.after = ValoarePlata1) ,
-                  options =list(dom = "t", scrollX = TRUE),
+                  data = vals_litigii_platite$litigii_platite,
+                  options =list(dom = "tp", scrollX = TRUE, pageLength = 5),
                   caption = ifelse(nrow(vals_litigii_platite$litigii_platite) >0 ,"Contracte de Garantare aferente unor litigii platite dupa data de 30 septembrie 2020 si care nu se regasesc in lista
     de litigii actualizate platite:", "Nu exista contracte platite dupa 30 septembrie neactualizate in lista de litigii platite"))  })
   
@@ -60,17 +73,7 @@ mod_litigii_platite_server <- function(input, output, session,vals){
     actionButton(inputId = session$ns("edit_litigii_platite"), icon = icon("mouse-pointer"),
                  label = "Select row and click to update provizion litigiu contract platit")  })
   
-  observeEvent(vals_litigii_platite$bi_litigii_contracte_platite,{
-    
-    vals_litigii_platite$litigii_platite <- litigii_sep %>% 
-        dplyr::filter(`Nr contract` %in% vals_litigii_platite$bi_litigii_contracte_platite$`Numar contract`) %>%
-      
-      dplyr::left_join(vals_litigii_platite$bi_litigii_contracte_platite, by = c("Nr contract" = "Numar contract")) %>% 
-      dplyr::filter(DataPlata1 > as.Date("2020-09-30")) %>% 
-      dplyr::filter(!`Nr contract` %in% 
-      dplyr::pull(.data = dplyr::filter(vals$litigii_update,updated_by == "automated_contract_platit"),`Nr contract`))
-    
-  })
+  
   
   
   observeEvent(input$edit_litigii_platite,{req(input$litigii_contracte_platite_rows_selected) 
@@ -79,18 +82,23 @@ mod_litigii_platite_server <- function(input, output, session,vals){
       dplyr::slice(input$litigii_contracte_platite_rows_selected)
     
     showModal(modalDialog(title = paste0("Edit litigiu pentru procesare plata, numar litigiu - ",
-                                         vals_litigii_platite$dosar_selectat_plata$`Nr dosar instanta`, ", beneficiar ",vals_litigii_platite$dosar_selectat_plata$Beneficiar_Juridic,
-                                         ", numar contract de garantare ", vals_litigii_platite$dosar_selectat_plata$`Nr contract`),  size = "l",
-                          footer = list(modalButton('Cancel'),actionButton(session$ns('submit_plata'), 'Submit', class = "btn btn-primary")),
+    vals_litigii_platite$dosar_selectat_plata$`Nr dosar instanta`, ", beneficiar ",
+    vals_litigii_platite$dosar_selectat_plata$Beneficiar_Juridic,
+            ", numar contract de garantare ", 
+    vals_litigii_platite$dosar_selectat_plata$`Nr contract`),  size = "l",
+                          footer = list(modalButton('Cancel'),actionButton(session$ns('submit_plata'), 
+                                                              'Submit', class = "btn btn-primary")),
                           
                           fluidRow(column(width = 6,textAreaInput(session$ns("solutie_dosar_platit"),label = "Ultima solutie",
-                                                                  value = vals_litigii_platite$dosar_selectat_plata$`Stadiul procesului`, width = "400px", height = "150px"),
+                                          value = vals_litigii_platite$dosar_selectat_plata$`Stadiul procesului`,
+                                          width = "400px", height = "150px"),
                                           
-                                          numericInput(inputId = session$ns("coef_proviz_contract_platit"),label = "Coeficient actual de provizionare",
-                                                       width = "400px", value = vals_litigii_platite$dosar_selectat_plata$`Coeficient provizionare`)),
+                                          numericInput(inputId = session$ns("coef_proviz_contract_platit"),
+                                                  label = "Coeficient actual de provizionare", width = "400px", 
+                                            value = vals_litigii_platite$dosar_selectat_plata$`Coeficient provizionare`)),
                                    
                                    column(width = 6, dateInput(inputId = session$ns("edit_data_plata"),label = "Data platii contractului",
-                                                               value = vals_litigii_platite$dosar_selectat_plata$DataPlata1,width = "400px"),
+                                                               value = vals_litigii_platite$dosar_selectat_plata$data_plata,width = "400px"),
                                           selectInput(inputId = session$ns("edit_coef_plata"),label = "Selecteaza noul coeficient de provizionare",
                                                       choices = c(0,1,0.25,0.65),selected = 0,width = "400px")
                                    ))
@@ -110,13 +118,15 @@ mod_litigii_platite_server <- function(input, output, session,vals){
                     update_sentinta = NA_character_,
                     updated_by = "automated_contract_platit")
     
-    if (janitor::compare_df_cols_same(vals_litigii_platite$litigiu_plati_update,vals$litigii_update)) {
+    if (janitor::compare_df_cols_same(vals_litigii_platite$litigiu_plati_update,vals$litigii_curente)) {
       
-      vals$litigii_update <- dplyr::bind_rows(vals_litigii_platite$litigiu_plati_update,vals$litigii_update)
+      vals$litigii_curente <- dplyr::bind_rows(vals_litigii_platite$litigiu_plati_update,
+                      vals$litigii_curente %>% 
+                        dplyr::filter(`Nr dosar instanta` != vals_litigii_platite$dosar_selectat_plata$`Nr dosar instanta`))
       
       vals_litigii_platite$litigii_platite <-  vals_litigii_platite$litigii_platite %>% 
         dplyr::filter(`Nr dosar instanta` != vals_litigii_platite$dosar_selectat_plata$`Nr dosar instanta`) 
-        #%>% dplyr::relocate(`Stadiul procesului`,.after = ValoarePlata1)
+        
       }
     
     else {shinyWidgets::sendSweetAlert(session = session,title = "STOP", type = "error",
@@ -124,12 +134,12 @@ mod_litigii_platite_server <- function(input, output, session,vals){
     
   })
   
-  # Observer - every time litigii_update se modifica, acesta va fi salvat in baza de date litigii_update.rda
+  # Observer - every time litigii_curente se modifica, acesta va fi salvat in baza de date litigii_update.rda
   
-  observeEvent(vals$litigii_update,{req(input$submit_plata)
-    litigii_update <- isolate(vals$litigii_update)
+  observeEvent(vals$litigii_curente,{req(input$submit_plata)
+    litigii_curente <- isolate(vals$litigii_curente)
     
-    usethis::use_data(litigii_update,internal = FALSE,overwrite = TRUE,compress = "gzip",version = 3)
+    usethis::use_data(litigii_curente,internal = FALSE,overwrite = TRUE,compress = "gzip",version = 3)
     
     shinyWidgets::sendSweetAlert(session = session,title = "SUCCES",type = "success",
           text = "Lista de litigii a fost actualizata cu succes. Verifica in Litigii actualizate - 

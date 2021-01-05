@@ -18,6 +18,7 @@
 usethis::use_package( "golem")
 usethis::use_pipe(export = TRUE)
 usethis::use_data(litigii_sep,internal = FALSE,overwrite = TRUE,compress = "gzip",version = 3)
+usethis::use_data(litigii_curente,internal = FALSE,overwrite = TRUE,compress = "gzip",version = 3)
 usethis::use_data(litigii_update,internal = FALSE,overwrite = TRUE,compress = "gzip",version = 3)
 usethis::use_data(bi_litigii_contracte_platite,internal = FALSE,overwrite = TRUE,compress = "gzip",version = 3)
 usethis::use_data(sinteza_bi_litigii,internal = FALSE,overwrite = TRUE,compress = "gzip",version = 3)

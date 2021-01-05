@@ -37,31 +37,33 @@ mod_litigii_ui <- function(id){
 mod_litigii_server <- function(input, output, session, vals){
   ns <- session$ns
   
+  # This modules controls Litigii actualizate from Litigii la zi sidebar menu.
+  
   output$down_update_sentinte <- downloadHandler(filename = function() {"sentinte_updatate.csv"},
-        content = function(file) {readr::write_csv(vals$litigii_update %>% 
+        content = function(file) {readr::write_csv(vals$litigii_curente %>% 
                           dplyr::filter(updated_by != "update_litigiu"),path = file) })
  
   output$down_litigii_platite <- downloadHandler(filename = function() {"litigii_platite.csv"},
-              content = function(file) {readr::write_csv(x = vals$litigii_update %>% 
+              content = function(file) {readr::write_csv(x = vals$litigii_curente %>% 
                                 dplyr::filter(updated_by == "automated_contract_platit"),path = file) })
   
-  observeEvent(vals$litigii_update,{     
+  observeEvent(vals$litigii_curente,{     
     output$litigii_update_sentinte <-  DT::renderDataTable({ DT::datatable( rownames = FALSE, class = "nowrap",
         options = list(scrollX = TRUE, dom = "ftp", pageLength = 5),
-        data = vals$litigii_update %>% dplyr::filter(updated_by != "update_litigiu") %>%
+        data = vals$litigii_curente %>% dplyr::filter(updated_by != "update_litigiu") %>%
           dplyr::select(-Nr_crt,-data_plata) %>% dplyr::filter(!is.na(update_sentinta)) %>%
           dplyr::select(1, 2, 6, 7, 9, 12, 11, 14,15, 13, 10, 3:5, 8),
         caption = "Litigii cu stadiu modificat dupa 30 septembrie 2020:") })
   
     output$litigii_update_plati <- DT::renderDataTable({ DT::datatable( rownames = FALSE, class = "nowrap",
         options = list(scrollX = TRUE, dom = "ftp", pageLength = 5),
-        data = vals$litigii_update %>% dplyr::filter(updated_by == "automated_contract_platit") %>%
-          dplyr::select(-Nr_crt,-data_actualizare_sentinta) %>% dplyr::select(1, 2, 6, 7, 9:17,3:5, 8),
+        data = vals$litigii_curente %>% dplyr::filter(updated_by == "automated_contract_platit") %>%
+          dplyr::select(-Nr_crt,-data_actualizare_sentinta) %>% dplyr::select(1:2,15,14,12,11,10,9,3:8),
         caption = "Litigii platite:") })
     
     output$litigii_noi_updated <- DT::renderDataTable({ DT::datatable(rownames = FALSE,
           class = "nowrap",  options = list(scrollX = TRUE,  dom = "ftp", pageLength = 5),
-          data = vals$litigii_update %>% dplyr::filter(updated_by == "update_litigiu") %>%
+          data = vals$litigii_curente %>% dplyr::filter(updated_by == "update_litigiu") %>%
             dplyr::select(-Nr_crt,-data_plata),
           caption = "Litigii noi care au actualizat litigii existente:" ) })
     

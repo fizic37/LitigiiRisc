@@ -21,13 +21,13 @@ mod_sidebar_server <- function(input, output, session,vals){
   ns <- session$ns
  
   risk_user_sidebar <- shinydashboard::sidebarMenu(id = ns("tabs"),
-                            shinydashboard::menuItem(tabName = "home",text = "Home",icon = icon("home"),selected = T),
+                            shinydashboard::menuItem(tabName = "home",text = "Home",icon = icon("home"),selected = F),
                             shinydashboard::menuItem(tabName = "litigii",  
                                 text = "Litigii actualizate",icon=icon("balance-scale"),selected = F,
-                                shinydashboard::menuSubItem(text = "Litigii la zi ",tabName = "litigii_current",selected = F,
+                                shinydashboard::menuSubItem(text = "Litigii la zi ",tabName = "litigii_current",selected = T,
                                                           icon = icon("calendar-alt")),
-                                shinydashboard::menuSubItem(text = "Litigiile actualizate",icon = icon("pen-fancy"),
-                                                            tabName = "litigii",selected = FALSE),
+                                #shinydashboard::menuSubItem(text = "Litigiile actualizate",icon = icon("pen-fancy"),
+                                    #                        tabName = "litigii",selected = FALSE),
                                 shinydashboard::menuSubItem(text = "Ultimul sold inghetat ",icon = icon("camera"),
                                                             tabName = "litigii_inghetate",selected = FALSE)),
                             shinydashboard::menuItem(tabName = "actualizare_automata",  
