@@ -54,7 +54,7 @@ app_server <- function( input, output, session ) {
     }
     
     if (sum("home" == vals$sidebar_selected)==1) {
-      callModule(mod_home_server, "home_ui_1")
+      callModule(mod_home_server, "home_ui_1",parrent = session)
       vals$sidebar_selected <- c(vals$sidebar_selected,"home")
     }
   })

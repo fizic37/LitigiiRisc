@@ -11,19 +11,19 @@ mod_litigii_noi_automate_ui <- function(id){
   ns <- NS(id)
   
   tagList(
-    shinydashboard::box(title = "Litigii noi care actualizeaza litigii existente",width = 12, 
+    shinydashboard::box(title = "Litigii al caror numar s-a actualizat",width = 12, 
+                        footer = "In tabelul de mai sus se gasesc noile numere ale unor litigii in derulare (
+                        tipc acestea contin * sau /a)",
                         status = "success",collapsible = T,collapsed = T,
                         
                         DT::dataTableOutput(ns("litigii_noi_updated")),
                         tags$script(src = "datatable_updated.js"),
                         tags$script(paste0("table_updated_module_js('", ns(''), "')"))),
                         
-    shinydashboard::box(title = "Litigii noi automatizate",width = 12,status = "success",collapsible = T,collapsed = T,
+    shinydashboard::box(title = "Litigii noi automatizate (preluate de pe portal.just.ro)",
+                        width = 12,status = "success",collapsible = T,collapsed = T,
                         shinyjs::useShinyjs(),
-                        
-                        
                         tagList(
-                          
                           DT::dataTableOutput(ns("tabel_litigii")) ,
                           
                           tags$script(src = "datatable.js"),
@@ -78,7 +78,10 @@ mod_litigii_noi_automate_server <- function(input, output, session, vals){
       dplyr::filter(!numar_dosare_interogare %in% 
                       vals$litigii_curente$`Nr dosar instanta`[vals$litigii_curente$updated_by == "update_litigiu"]) %>%
       # Elimin dosarele care au fost marcate ca noi si nu ca update
-      dplyr::filter(!numar_dosare_interogare %in% vals_litigii_noi$litigiu_nou_from_updates$numar_dosare_interogare)
+      dplyr::filter(!numar_dosare_interogare %in% vals_litigii_noi$litigiu_nou_from_updates$numar_dosare_interogare) %>%
+      
+      # One time filter - to be eliminated in the future. Primul dosar s-a actualizat iar al doilea a fost introdus manual in sold inghetat
+      dplyr::filter(!numar_dosare_interogare %in% c("29061/299/2019*","32373/299/2020"))
     
     vals_litigii_noi$dosare_noi_final <- vals_litigii_noi$dosare_noi %>% dplyr::filter(!numar_dosare_interogare %in% 
                                                                                          vals_litigii_noi$dosare_noi_updated$numar_dosare_interogare) %>%

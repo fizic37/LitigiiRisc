@@ -10,7 +10,7 @@
 mod_litigii_platite_ui <- function(id){
   ns <- NS(id)
  
-  shinydashboard::box(title = "Update plati",
+  shinydashboard::box(title = "Actualizare litigii platite",
     width = 12,  status = "success", collapsible = T,  collapsed = T,
     DT::dataTableOutput(ns("sinteza_bi_plati")),
     hr(),

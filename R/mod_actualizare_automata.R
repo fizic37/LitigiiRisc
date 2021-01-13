@@ -13,7 +13,7 @@ mod_actualizare_automata_ui <- function(id){
   fluidRow(
     mod_litigii_noi_automate_ui("litigii_noi_automate_ui_1"),
     
-    shinydashboard::box(title = "Actualizare automata solutii dosare existente",
+    shinydashboard::box(title = "Actualizare automata solutii dosare existente (preluate de pe portal.just.ro)",
                       status = "success",width = 12,collapsible = T,collapsed = T,
                       
                       actionButton(ns("select_rows"),

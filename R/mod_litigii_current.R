@@ -37,7 +37,9 @@ mod_litigii_current_ui <- function(id){
     DT::dataTableOutput(ns("litigii_current")),
   )) ) ,
   tabPanel(title = "Sinteza litigii curente", 
-           DT::dataTableOutput(ns("sinteza_litigii_curent")) )  )  
+           DT::dataTableOutput(ns("sinteza_litigii_curent")),
+           h5("In tabelul de mai sus, atunci cand este filtrat pentru neactualizat (din tab-ul Litigii la zi), nu va 
+              aduce litigiul 11683/299/2019 aferent beneficiarului Lyo Best food care era dublat la 30.09.2020"))  )  
 }
     
 #' litigii_current Server Function
@@ -132,8 +134,9 @@ mod_litigii_current_server <- function(input, output, session, vals){
     
     output$sinteza_litigii_curent <- DT::renderDataTable({  DT::datatable(  rownames = FALSE,
           class = "compact",  extensions = "Buttons",  options = list(dom = "Bt", buttons = c("excel")),
-          caption = paste0("Sinteza regularizare provizioane curente la data de ",
-            input$data_litigii_current,   "_filter_",  input$filter_litigii_curente),
+          caption = htmltools::tags$caption(style = 'caption-side: above; text-align: left;',
+            paste0("Sinteza regularizare provizioane curente la data de ",
+            input$data_litigii_current,   "_filter_",  input$filter_litigii_curente)),
           data = if (input$filter_litigii_curente == "all") {
             vals_current$litigii_curent_prelucrat %>% dplyr::group_by(Tip_litigiu) %>%
               dplyr::summarise(dplyr::across(.cols = c(`Suma litigiu - echiv lei`,
@@ -180,9 +183,9 @@ mod_litigii_current_server <- function(input, output, session, vals){
                                         value = vals_current$litigiu_selectat$Beneficiar_Juridic),
                               textInput(inputId = session$ns("numar_contract_litigiu"), label = "Numar contract litigiu",
                                         value = vals_current$litigiu_selectat$`Nr contract`),
-                              selectInput(inputId = session$ns("coef_proviz_vechi"),label = "Coeficient provizionare vechi",
-                                           selected = vals_current$litigiu_selectat$`Coeficient provizionare`,
-                                          choices = c(0,0.25,0.65,1)),
+                              textInput(inputId = session$ns("coef_proviz_vechi"),label = "Coeficient provizionare vechi",
+                                           value = vals_current$litigiu_selectat$`Coeficient provizionare`),
+                                         
                               textInput(session$ns("provizion_vechi"),label = "Provizion contabil anterior",
                                            value = vals_current$litigiu_selectat$`Necesar provizion septembrie 2020` %>%
                                               formatC(digits = 2,big.mark = ",",format = "f",mode = "double")),
@@ -195,9 +198,8 @@ mod_litigii_current_server <- function(input, output, session, vals){
                               textInput(inputId = session$ns("suma_litigiu"),label = "Suma litigiu",
                                         value = vals_current$litigiu_selectat$`Suma litigiu - echiv lei` %>%
                                           formatC(digits = 2,big.mark = ",",format = "f",mode = "double")),
-                              selectInput(inputId = session$ns("update_coef"), label = "Coeficient de provizionare updatat",
-                                          selected = vals_current$litigiu_selectat$update_coef_proviz,
-                                          choices = c(0,0.25,0.65,1)),
+                              textInput(inputId = session$ns("update_coef"), label = "Coeficient de provizionare updatat",
+                                          value = vals_current$litigiu_selectat$update_coef_proviz),
                               textInput(session$ns("regularizare_provizion"),label = "Regularizare provizion",
                                            value = vals_current$litigiu_selectat$Regularizare_provizion %>% 
                                               formatC(digits = 2,big.mark = ",",format = "f",mode = "double")),
