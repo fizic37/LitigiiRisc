@@ -25,7 +25,8 @@ app_ui <- function(request) {
           shinydashboard::tabItem(tabName = "actualizare_automata", 
                               mod_actualizare_automata_ui("actualizare_automata_ui_1")),
           shinydashboard::tabItem(tabName = "litigii_noi", 
-                                  mod_litigii_noi_ui("litigii_noi_ui_1")))))
+                                  mod_litigii_noi_manuale_ui("litigii_noi_manuale_ui_1"))
+          )))
     )
   )
 }

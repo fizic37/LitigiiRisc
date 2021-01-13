@@ -37,11 +37,13 @@ app_server <- function( input, output, session ) {
     if (sum("actualizare_automata" == vals$sidebar_selected)==1) {
       callModule(mod_actualizare_automata_server, "actualizare_automata_ui_1", vals)
       callModule(mod_litigii_platite_server, "litigii_platite_ui_1",vals)
+      callModule(mod_litigii_noi_automate_server, "litigii_noi_automate_ui_1", vals)
       vals$sidebar_selected <- c(vals$sidebar_selected,"actualizare_automata")
     }
     
     if (sum("litigii_noi" == vals$sidebar_selected)==1) {
-      callModule(mod_litigii_noi_server, "litigii_noi_ui_1", vals)
+      callModule(mod_litigii_noi_manuale_server, "litigii_noi_manuale_ui_1", vals)
+      #callModule(mod_litigii_noi_server, "litigii_noi_ui_1", vals)
       vals$sidebar_selected <- c(vals$sidebar_selected,"litigii_noi")
     }
     

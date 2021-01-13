@@ -33,7 +33,7 @@ mod_sidebar_server <- function(input, output, session,vals){
                             shinydashboard::menuItem(tabName = "actualizare_automata",  
                                   text = "Actualizare automata",icon=icon("laptop-code"),selected = F),
                             shinydashboard::menuItem(tabName = "litigii_noi",  
-                                                     text = "Litigii noi",icon=icon("plus"),selected = F)
+                                                     text = "Litigii noi manuale",icon=icon("highlighter"),selected = F)
                             #,shinydashboard::menuItem(tabName = "actualizare_manuala",  
                              #     text = "Actualizare manuala",icon = icon("highlighter"),selected = F)
                             )

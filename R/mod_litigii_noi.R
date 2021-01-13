@@ -9,15 +9,16 @@
 #' @importFrom shiny NS tagList 
 mod_litigii_noi_ui <- function(id){
   ns <- NS(id)
+  
   shinydashboard::tabBox(width = 12,tabPanel(
   tags$style(HTML('.nav-tabs-custom>.nav-tabs>li.active {border-top-color: #3cbcad;}')),
   
     title = "Litigii noi",icon = icon("plus-square"),
   fluidRow(
+    
   shinydashboard::box(title = "Litigii noi automatizate",width = 12,status = "success",collapsible = T,collapsed = F,
   shinyjs::useShinyjs(),
  
-  # shinybusy::add_busy_spinner(timeout = 200,position = "bottom-right"),
   
   tagList(
     

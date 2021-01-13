@@ -37,6 +37,8 @@ golem::add_module( name = "litigii_inghetate")
 golem::add_module( name = "litigii_noi")
 golem::add_module( name = "home")
 golem::add_module( name = "litigii_platite")
+golem::add_module( name = "litigii_noi_automate")
+golem::add_module( name = "litigii_noi_manuale")
 
 ## Add helper functions ----
 ## Creates ftc_* and utils_*

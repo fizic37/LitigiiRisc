@@ -10,15 +10,18 @@
 mod_actualizare_automata_ui <- function(id){
   ns <- NS(id)
   
-  tagList(
-    mod_litigii_platite_ui("litigii_platite_ui_1"),
+  fluidRow(
+    mod_litigii_noi_automate_ui("litigii_noi_automate_ui_1"),
+    
     shinydashboard::box(title = "Actualizare automata solutii dosare existente",
-                      status = "success",width = 12,collapsible = T,collapsed = F,
+                      status = "success",width = 12,collapsible = T,collapsed = T,
                       
                       actionButton(ns("select_rows"),
                       label = "Click aici pentru actualizare dosar",icon = icon("mouse-pointer")),br(),
                       verbatimTextOutput(ns("diverse")),
-                      DT::dataTableOutput(ns("dosare_actualizate")))
+                      DT::dataTableOutput(ns("dosare_actualizate"))),
+    
+    mod_litigii_platite_ui("litigii_platite_ui_1")
   )
   
  
@@ -32,7 +35,7 @@ mod_actualizare_automata_server <- function(input, output, session, vals){
   
   dosare_juridic <- readRDS("sentinte_actualizate") %>% 
     dplyr::filter(!is.na(ultima_data_pronuntare_results) & ultima_data_pronuntare_results > as.Date("2020-09-30"))
-  #load("data/litigii_sep.rda")
+  
   vals_automated <- reactiveValues()
   
   observeEvent(vals$litigii_curente,{
@@ -180,6 +183,7 @@ mod_actualizare_automata_server <- function(input, output, session, vals){
           update_sentinta = input$edit_solutie_dosar,
           updated_by = "automated"),
           vals$litigii_curente %>% dplyr::filter(`Nr dosar instanta` != vals_automated$dosar_juridic_selectat$Numar_dosar))
+      updateActionButton(session = session, inputId = "submit")
     }
     
     

@@ -126,6 +126,8 @@ mod_litigii_platite_server <- function(input, output, session,vals){
       
       vals_litigii_platite$litigii_platite <-  vals_litigii_platite$litigii_platite %>% 
         dplyr::filter(`Nr dosar instanta` != vals_litigii_platite$dosar_selectat_plata$`Nr dosar instanta`) 
+      
+      updateActionButton(session = session, inputId = "submit_plata")
         
       }
     
